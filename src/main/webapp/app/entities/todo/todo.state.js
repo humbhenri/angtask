@@ -83,8 +83,8 @@
                         entity: function () {
                             return {
                                 body: null,
-                                created: null,
-                                done: null,
+                                created: Date.now(),
+                                done: false,
                                 id: null
                             };
                         }

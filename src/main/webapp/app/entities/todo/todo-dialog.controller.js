@@ -1,53 +1,66 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    angular
-        .module('angtaskApp')
-        .controller('TodoDialogController', TodoDialogController);
+	angular.module('angtaskApp').controller('TodoDialogController',
+			TodoDialogController);
 
-    TodoDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Todo', 'User'];
+	TodoDialogController.$inject = [ '$timeout', '$scope', '$stateParams',
+			'$uibModalInstance', 'entity', 'Todo', 'User', 'Principal' ];
 
-    function TodoDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Todo, User) {
-        var vm = this;
+	function TodoDialogController($timeout, $scope, $stateParams,
+			$uibModalInstance, entity, Todo, User, Principal) {
+		var vm = this;
 
-        vm.todo = entity;
-        vm.clear = clear;
-        vm.datePickerOpenStatus = {};
-        vm.openCalendar = openCalendar;
-        vm.save = save;
-        vm.users = User.query();
+		vm.todo = entity;
+		vm.clear = clear;
+		vm.datePickerOpenStatus = {};
+		vm.openCalendar = openCalendar;
+		vm.save = save;
+		vm.users = User.query();
+		vm.currentUser = null;
 
-        $timeout(function (){
-            angular.element('.form-group:eq(1)>input').focus();
-        });
+		(function() {
+			Principal.identity().then(function(account) {
+				User.get({
+					login : account.login
+				}).$promise.then(function(user) {
+					vm.currentUser = user;
+				});
+			});
+		})();
 
-        function clear () {
-            $uibModalInstance.dismiss('cancel');
-        }
+		$timeout(function() {
+			angular.element('.form-group:eq(1)>input').focus();
+		});
 
-        function save () {
-            vm.isSaving = true;
-            if (vm.todo.id !== null) {
-                Todo.update(vm.todo, onSaveSuccess, onSaveError);
-            } else {
-                Todo.save(vm.todo, onSaveSuccess, onSaveError);
-            }
-        }
+		function clear() {
+			$uibModalInstance.dismiss('cancel');
+		}
 
-        function onSaveSuccess (result) {
-            $scope.$emit('angtaskApp:todoUpdate', result);
-            $uibModalInstance.close(result);
-            vm.isSaving = false;
-        }
+		function save() {
+			vm.isSaving = true;
+			if (vm.todo.id !== null) {
+				Todo.update(vm.todo, onSaveSuccess, onSaveError);
+			} else {
+				vm.todo.user = vm.currentUser;
+				Todo.save(vm.todo, onSaveSuccess, onSaveError);
+			}
+		}
 
-        function onSaveError () {
-            vm.isSaving = false;
-        }
+		function onSaveSuccess(result) {
+			$scope.$emit('angtaskApp:todoUpdate', result);
+			$uibModalInstance.close(result);
+			vm.isSaving = false;
+		}
 
-        vm.datePickerOpenStatus.created = false;
+		function onSaveError() {
+			vm.isSaving = false;
+		}
 
-        function openCalendar (date) {
-            vm.datePickerOpenStatus[date] = true;
-        }
-    }
+		vm.datePickerOpenStatus.created = false;
+
+		function openCalendar(date) {
+			vm.datePickerOpenStatus[date] = true;
+		}
+	}
 })();

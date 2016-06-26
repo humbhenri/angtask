@@ -15,7 +15,9 @@
     </div>
     <br/>
     <div class="list-group">
-    	<a ui-sref="todo.edit({id:todo.id})" class="list-group-item" ng-repeat="todo in vm.todos track by todo.id">
+    	<a ui-sref="todo.edit({id:todo.id})" class="list-group-item" 
+    	ng-repeat="todo in vm.todos | orderBy:'done' track by todo.id"
+    	ng-class="{disabled: todo.done}">
     	 {{todo.body}}
     	</a>
     </div>

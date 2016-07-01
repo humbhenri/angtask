@@ -4,10 +4,10 @@
 	angular.module('angtaskApp').controller('TodoDialogController',
 			TodoDialogController);
 
-	TodoDialogController.$inject = [ '$timeout', '$scope', '$stateParams',
+	TodoDialogController.$inject = [ '$timeout', '$scope', '$rootScope', '$stateParams',
 			'$uibModalInstance', 'entity', 'Todo', 'User', 'Principal' ];
 
-	function TodoDialogController($timeout, $scope, $stateParams,
+	function TodoDialogController($timeout, $scope, $rootScope,$stateParams,
 			$uibModalInstance, entity, Todo, User, Principal) {
 		var vm = this;
 
@@ -62,5 +62,10 @@
 		function openCalendar(date) {
 			vm.datePickerOpenStatus[date] = true;
 		}
+		
+		$rootScope.$on('angtaskApp:todoDelete', function(event) {
+			$uibModalInstance.close(null);
+			vm.isSaving = false;
+        });
 	}
 })();

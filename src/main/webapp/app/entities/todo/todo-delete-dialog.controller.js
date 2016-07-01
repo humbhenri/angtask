@@ -5,9 +5,9 @@
         .module('angtaskApp')
         .controller('TodoDeleteController',TodoDeleteController);
 
-    TodoDeleteController.$inject = ['$uibModalInstance', 'entity', 'Todo'];
+    TodoDeleteController.$inject = ['$scope', '$uibModalInstance', 'entity', 'Todo'];
 
-    function TodoDeleteController($uibModalInstance, entity, Todo) {
+    function TodoDeleteController($scope, $uibModalInstance, entity, Todo) {
         var vm = this;
 
         vm.todo = entity;
@@ -22,6 +22,7 @@
             Todo.delete({id: id},
                 function () {
                     $uibModalInstance.close(true);
+                    $scope.$emit('angtaskApp:todoDelete', null);
                 });
         }
     }
